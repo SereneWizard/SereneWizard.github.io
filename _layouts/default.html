@@ -2,13 +2,15 @@
 <html lang="en">
   {% include head.html %}
   <body>
-      {% include header.html %}
+      {% include default_header.html %}
       <section id="about">
-        {% include about.html %}
+        {% include default_about.html %}
       </section>
       <section id="projects">
-        {% include projects.html %}
+        {% include default_projects.html %}
       </section>
         {{ content }}
-      {% include footer.html %}
+      {% include default_footer.html %}
+
+      {% include b4footer.html %}
   </body>
