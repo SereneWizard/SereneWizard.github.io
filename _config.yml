@@ -13,8 +13,16 @@ twitter_username: serene_wizard
 github_username:  SereneWizard
 gplus_username:  lorem_ipsum
 
+# My collections
+collections:
+  my_collections:
+    output: true
+
 # Google-analytics
 google-analytics:
   id: ""
+
+
+
 
 exclude: ['package.json', 'src' , 'node_modules']
