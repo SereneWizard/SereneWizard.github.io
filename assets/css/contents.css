@@ -386,6 +386,7 @@ form .form-group:first-child .floating-label-form-group {
 }
 
 footer {
+    display: block;
     padding: 10px 0 15px;
 }
 
