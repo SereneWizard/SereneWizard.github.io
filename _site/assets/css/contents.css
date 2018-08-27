@@ -2,6 +2,7 @@ body {
     font-size: 20px;
     color: #212529;
     font-family: 'Lora', 'Times New Roman', serif;
+    padding-bottom:0px;
 }
 
 p {
@@ -46,38 +47,9 @@ blockquote {
     margin-top: 60px;
 }
 
-.caption {
-    font-size: 14px;
-    font-style: italic;
-    display: block;
-    margin: 0;
-    padding: 10px;
-    text-align: center;
-    border-bottom-right-radius: 5px;
-    border-bottom-left-radius: 5px;
-}
 
- ::-moz-selection {
-    color: #fff;
-    background: #0085A1;
-    text-shadow: none;
-}
 
- ::selection {
-    color: #fff;
-    background: #0085A1;
-    text-shadow: none;
-}
-
-img::selection {
-    color: #fff;
-    background: transparent;
-}
-
-img::-moz-selection {
-    color: #fff;
-    background: transparent;
-}
+/* Navbar */
 
 #mainNav {
     position: absolute;
@@ -425,36 +397,3 @@ footer .list-inline {
 }
 
 
-.footer .love {
-    color: red
-}
-
-
-
-article,
-aside,
-details,
-figcaption,
-figure,
-footer,
-header,
-main,
-menu,
-nav,
-section {
-    display: block
-}
-
-.footer a {
-    text-decoration: none;
-    margin: 0;
-    color: #fff
-}
-
-.footer {
-    background: #1a222c;
-    padding: 10px 0;
-    margin-top: 100px;
-    text-align: center;
-    color: #fff
-}

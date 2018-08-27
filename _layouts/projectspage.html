@@ -6,7 +6,7 @@
     {% include navbar.html %}
 
     <!-- Page Header -->
-    <header class="jumbotron" style="background-image: url('/assets/img/home-bg.jpg');">
+    <header class="masthead" style="background-image: url('/assets/img/home-bg.jpg');">
         <div class="overlay"></div>
         <div class="container">
             <div class="row">
@@ -19,6 +19,7 @@
             </div>
         </div>
     </header>
+
 
     <!-- Main Content -->
     <div class="container">
@@ -36,13 +37,12 @@
                     </a>
 
                 </div>
-                <hr> {% endfor %}
-                <hr>
+                <hr> 
+                {% endfor %}
             </div>
         </div>
     </div>
 
-    {% include contents_footer.html %}
 
 </body>
 
