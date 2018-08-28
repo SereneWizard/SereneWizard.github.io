@@ -1,43 +1,14 @@
+---
+layout: eachproject
+title: Buffer Multiline
+description: ESRI shapefile of Polyline type has been buffered into multiline
+---
+
+
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <title>Shapefile to PostGIS</title>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-
-    <!-- Custom fonts for this template -->
-    <link href="vendor/font-awesome/css/font-awesome.min.css" rel="stylesheet" type="text/css">
-    <link href='https://fonts.googleapis.com/css?family=Lora:400,700,400italic,700italic' rel='stylesheet' type='text/css'>
-    <link href='https://fonts.googleapis.com/css?family=Open+Sans:300italic,400italic,600italic,700italic,800italic,400,300,600,700,800' rel='stylesheet' type='text/css'>
-
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.2/css/bootstrap.min.css" integrity="sha384-Smlep5jCw/wG7hdkwQ/Z5nLIefveQRIY9nfy6xoR1uRYBtpZgI6339F5dgvm/e9B" crossorigin="anonymous">
-    <link rel="stylesheet" href="/assets/css/contents.css">
-</head>
-<body>
-<!-- Navigation -->
-  <nav class="navbar  navbar-dark bg-dark fixed-top">
-        <div class="container">
-            <a class="navbar-brand" href= '/index.html' >Home</a>
-                <div class="row">
-                    <div class="col-sm">
-                        <a class="nav-link" href='/index.html'>Home</a>
-                    </div>
-                    <div class="nav-item col-sm">
-                        <a class="nav-link" href="about.html">About</a>
-                    </div>
-                    <div class="nav-item col-sm">
-                        <a class="nav-link" href="contact.html">Contact</a>
-                    </div>
-                </div>
-        </div>
-    </nav>
-
-    <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>shapefile_to_postgis</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
+<title>buffer_multiline</title><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
 
 <style type="text/css">
@@ -11830,7 +11801,7 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<p><em>The dataset and the code can be cloned from <a href="https://github.com/SereneWizard/foss4geo">this github repo</a>.</em></p>
+<p><em>The dataset and code can be found in <a href="https://github.com/SereneWizard/foss4geo">this github repo</a>.</em></p>
 
 </div>
 </div>
@@ -11839,167 +11810,20 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h1 id="Read-from-shapefile-to-PostGIS-table">Read from shapefile to PostGIS table<a class="anchor-link" href="#Read-from-shapefile-to-PostGIS-table">&#182;</a></h1>
+<h1 id="Buffer-Multiline">Buffer Multiline<a class="anchor-link" href="#Buffer-Multiline">&#182;</a></h1>
 </div>
 </div>
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[21]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Import necessary libraries</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">glob</span>
-<span class="kn">import</span> <span class="nn">psycopg2</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="k">import</span> <span class="n">glob</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">fiona</span>
-<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">Polygon</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Let's read some of the necessary metadata from the shapefile. Metadata read includes the CRS, the attributes of the features. For this, we will use <em>fiona</em> to read the first feature (using context manager) from the shapefile and extract the metadata from it.</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">infname</span> <span class="o">=</span> <span class="n">glob</span><span class="o">.</span><span class="n">glob</span><span class="p">(</span><span class="s1">&#39;vector/*.shp&#39;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-<span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">drivers</span><span class="p">():</span>
-    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infname</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
-        <span class="n">geom</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">crs</span>
-        <span class="n">feat</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">next</span><span class="p">()</span>
-        <span class="n">attributes</span> <span class="o">=</span> <span class="n">feat</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-        <span class="n">gemtype</span> <span class="o">=</span> <span class="n">feat</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;type&#39;</span><span class="p">]</span>
-        
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Next, we connect to a postgres database (in this case, in the localhost)</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">connection</span> <span class="o">=</span> <span class="n">psycopg2</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">database</span><span class="o">=</span><span class="s2">&quot;mydatabase&quot;</span><span class="p">,</span>
-                              <span class="n">user</span><span class="o">=</span><span class="s2">&quot;myusername&quot;</span><span class="p">,</span>
-                              <span class="n">password</span><span class="o">=</span><span class="s2">&quot;mypassword&quot;</span><span class="p">,</span>
-                              <span class="n">host</span><span class="o">=</span><span class="s2">&quot;localhost&quot;</span><span class="p">)</span>
-<span class="n">cursor</span> <span class="o">=</span> <span class="n">connection</span><span class="o">.</span><span class="n">cursor</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Here, we will create a table in postgres. If we want to get a little bit fancy, we could automate the number and the names of the columns to correspond to the shapefile metatadata we read earlier into the variable <em>attributes</em></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">tablename</span> <span class="o">=</span> <span class="s2">&quot;Mclean_Dupage&quot;</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;DROP TABLE IF EXISTS </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tablename</span><span class="p">))</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">               CREATE TABLE </span><span class="si">{}</span><span class="s2"></span>
-<span class="s2">               (id SERIAL PRIMARY KEY,</span>
-<span class="s2">               COUNTY_NAM VARCHAR NOT NULL,</span>
-<span class="s2">               CO_FIPS BIGINT NOT NULL,</span>
-<span class="s2">               geom GEOMETRY)&quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tablename</span><span class="p">))</span>
-<span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Next, we will read each feature from the shapefile and write it as a postgres record:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">drivers</span><span class="p">():</span>
-    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">infname</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">src</span><span class="p">:</span>
-            <span class="n">record</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">values</span><span class="p">())</span>
-            <span class="nb">print</span> <span class="p">(</span><span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> county has </span><span class="si">{}</span><span class="s2"> fips&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">record</span><span class="p">))</span>
-            <span class="n">geometry</span> <span class="o">=</span> <span class="n">Polygon</span><span class="p">(</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">][</span><span class="s1">&#39;coordinates&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
-            <span class="n">wktgeometry</span> <span class="o">=</span> <span class="n">geometry</span><span class="o">.</span><span class="n">wkt</span>
-            <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">                   INSERT INTO </span><span class="si">{}</span><span class="s2"> (COUNTY_NAM, CO_FIPS, geom)</span>
-<span class="s2">                   VALUES (&#39;</span><span class="si">{}</span><span class="s2">&#39;, </span><span class="si">{}</span><span class="s2">, ST_GeomFromText(&#39;</span><span class="si">{}</span><span class="s2">&#39;))</span>
-<span class="s2">                   &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tablename</span><span class="p">,</span> <span class="o">*</span><span class="n">record</span><span class="p">,</span> <span class="n">wktgeometry</span><span class="p">))</span>
-            <span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-</pre></div>
-
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing text_cell rendered"><div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<p>Next we assign coordinate reference system (CRS) to the PostGIS table:</p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
-<span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="s2">&quot;&quot;&quot;</span>
-<span class="s2">               ALTER TABLE </span><span class="si">{}</span><span class="s2"></span>
-<span class="s2">                   ALTER COLUMN geom TYPE geometry(Polygon, 4269)</span>
-<span class="s2">                       USING ST_SetSRID(geom, 4269);</span>
-<span class="s2">                       &quot;&quot;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">tablename</span><span class="p">))</span>
-<span class="n">connection</span><span class="o">.</span><span class="n">commit</span><span class="p">()</span>
+<span class="kn">from</span> <span class="nn">shapely.geometry</span> <span class="k">import</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">shape</span><span class="p">,</span> <span class="n">LineString</span><span class="p">,</span> <span class="n">Polygon</span>
 </pre></div>
 
 </div>
@@ -12009,14 +11833,63 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="prompt input_prompt">In&nbsp;[16]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Close the connection</span>
-<span class="n">connection</span><span class="o">.</span><span class="n">close</span>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Set up the work environment</span>
+<span class="n">workdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+<span class="n">indir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workdir</span><span class="p">,</span> <span class="s2">&quot;Indata&quot;</span><span class="p">,</span> <span class="s2">&quot;vector&quot;</span><span class="p">)</span>
+<span class="n">inLineShp</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">indir</span><span class="p">,</span> <span class="s2">&quot;Adams_IL_Is.shp&quot;</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">inLineShp</span><span class="p">),</span> <span class="s2">&quot;The specified file does not exist&quot;</span>
+<span class="n">outdir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">workdir</span><span class="p">,</span> <span class="s2">&quot;Outdata&quot;</span><span class="p">,</span> <span class="s2">&quot;Buffer_a_Line&quot;</span><span class="p">)</span>
+<span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">outdir</span><span class="p">):</span>
+    <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">outdir</span><span class="p">)</span>
 </pre></div>
 
 </div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[37]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span><span class="c1"># Buffer radius (in the units of the shapefile)</span>
+<span class="n">bufferRadius</span> <span class="o">=</span> <span class="mf">24.</span>
+<span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">inLineShp</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">src</span><span class="p">:</span>
+    <span class="n">outmeta</span> <span class="o">=</span> <span class="n">src</span><span class="o">.</span><span class="n">meta</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Units of measurement: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">outmeta</span><span class="p">[</span><span class="s1">&#39;crs&#39;</span><span class="p">][</span><span class="s1">&#39;units&#39;</span><span class="p">]))</span>
+    <span class="n">outmeta</span><span class="p">[</span><span class="s1">&#39;schema&#39;</span><span class="p">][</span><span class="s1">&#39;geometry&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Polygon&#39;</span>
+    <span class="k">with</span> <span class="n">fiona</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">outdir</span> <span class="o">+</span> <span class="n">os</span><span class="o">.</span><span class="n">sep</span> <span class="o">+</span> <span class="s2">&quot;Buffered_Adams_Is.shp&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="o">**</span><span class="n">outmeta</span><span class="p">)</span> <span class="k">as</span> <span class="n">dest</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">feature</span> <span class="ow">in</span> <span class="n">src</span><span class="p">:</span>
+            <span class="n">buffered_feature</span> <span class="o">=</span> <span class="n">mapping</span><span class="p">(</span><span class="n">shape</span><span class="p">(</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;geometry&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="n">bufferRadius</span><span class="p">))</span>
+            <span class="n">dest</span><span class="o">.</span><span class="n">write</span><span class="p">({</span>
+                <span class="s1">&#39;properties&#39;</span><span class="p">:</span><span class="n">feature</span><span class="p">[</span><span class="s1">&#39;properties&#39;</span><span class="p">],</span> 
+                <span class="s1">&#39;geometry&#39;</span><span class="p">:</span><span class="n">buffered_feature</span><span class="p">,</span> 
+            <span class="p">})</span>  
+</pre></div>
+
+</div>
+</div>
+</div>
+
+<div class="output_wrapper">
+<div class="output">
+
+
+<div class="output_area">
+
+<div class="prompt"></div>
+
+
+<div class="output_subarea output_stream output_stdout output_text">
+<pre>Units of measurement: us-ft
+</pre>
+</div>
+</div>
+
 </div>
 </div>
 
@@ -12029,7 +11902,3 @@ div#notebook {
 
 
 </html>
-
-    
-
-</body>
